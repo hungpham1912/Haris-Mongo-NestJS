@@ -29,6 +29,6 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    return await this.userRepository.deleteByQuery({ _id: id });
+    return await this.userRepository.softDeleteByQuery({ _id: id });
   }
 }

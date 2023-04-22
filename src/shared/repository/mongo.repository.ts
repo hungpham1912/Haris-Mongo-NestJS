@@ -9,7 +9,7 @@ export class MongoRepository<T> {
   }
   find(query?: FindOptionsWhere<T>): Promise<T[]> {
     try {
-      return this.model.find(query).exec();
+      return this.model.find({ ...query, deletedAt: { $eq: null } }).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -25,7 +25,7 @@ export class MongoRepository<T> {
   }
   findOne(query?: FindOptionsWhere<T>): Promise<T> {
     try {
-      return this.model.findOne(query).exec();
+      return this.model.findOne({ ...query, deletedAt: { $eq: null } }).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
