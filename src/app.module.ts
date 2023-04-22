@@ -5,6 +5,7 @@ import { RouterModule } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ENV_CONFIG } from './shared/constants/env.constant';
 import { DB_CONSTANT } from './shared/constants/db.constant';
+import { customProvider } from './app.provider';
 
 @Module({
   imports: [
@@ -20,5 +21,6 @@ import { DB_CONSTANT } from './shared/constants/db.constant';
     ]),
   ],
   controllers: [UsersController],
+  providers: [...customProvider],
 })
 export class AppModule {}

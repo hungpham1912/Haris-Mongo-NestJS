@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
-import { DB_CONSTANT } from 'src/shared/constants/db.constant';
+
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -17,11 +14,11 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.userRepository.find();
+    return await this.userRepository.find({ skip: 1 });
   }
 
   async findOne(id: string) {
-    return await this.userRepository.findOne({ _id: id });
+    return await this.userRepository.findOne({ where: { _id: id } });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -30,5 +27,18 @@ export class UsersService {
 
   async remove(id: string) {
     return await this.userRepository.softDeleteByQuery({ _id: id });
+  }
+
+  async count() {
+    return await this.userRepository.count();
+  }
+
+  async get() {
+    return await this.userRepository
+      .createQueryBuilder()
+      .andWhere({
+        $or: [{ fullName: { $eq: 'h' } }, { fullName: { $eq: 'g' } }],
+      })
+      .select();
   }
 }

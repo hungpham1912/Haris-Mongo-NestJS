@@ -23,7 +23,7 @@ export class UsersController {
 
   @Get()
   findAll() {
-    return this.usersService.findAll();
+    return this.usersService.get();
   }
 
   @Get(':id')
@@ -39,5 +39,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Get('count/ss')
+  count() {
+    return this.usersService.count();
   }
 }

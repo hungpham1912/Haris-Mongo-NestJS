@@ -2,14 +2,23 @@ import { Logger } from '@nestjs/common';
 import { FilterQuery, Model } from 'mongoose';
 import { FindOptionsWhere } from 'typeorm';
 import { DeleteResult, UpdateResult } from 'typeorm/driver/mongodb/typings';
+import { FindOptions } from './models/repository.model';
+import { MongoSelectBuilder } from './mongo.select-builder';
 
 export class MongoRepository<T> {
-  constructor(private model: Model<T>) {
+  constructor(public model: Model<T>) {
     this.model;
   }
-  find(query?: FindOptionsWhere<T>): Promise<T[]> {
+  find(options?: FindOptions<T>): Promise<T[]> {
+    const { where, skip, take } = options
+      ? options
+      : { where: {}, skip: null, take: null };
     try {
-      return this.model.find({ ...query, deletedAt: { $eq: null } }).exec();
+      return this.model
+        .find({ ...where, deletedAt: { $eq: null } })
+        .limit(take)
+        .skip(skip)
+        .exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -23,9 +32,10 @@ export class MongoRepository<T> {
       throw error;
     }
   }
-  findOne(query?: FindOptionsWhere<T>): Promise<T> {
+  findOne(options?: FindOptions<T>): Promise<T> {
+    const { where } = options ? options : { where: {} };
     try {
-      return this.model.findOne({ ...query, deletedAt: { $eq: null } }).exec();
+      return this.model.findOne({ ...where, deletedAt: { $eq: null } }).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -57,5 +67,16 @@ export class MongoRepository<T> {
       Logger.error(error);
       throw error;
     }
+  }
+  count(query?: FindOptionsWhere<T>) {
+    try {
+      return this.model.count({ ...query, deletedAt: { $eq: null } }).exec();
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
+  }
+  createQueryBuilder() {
+    return new MongoSelectBuilder<T>(this.model);
   }
 }
