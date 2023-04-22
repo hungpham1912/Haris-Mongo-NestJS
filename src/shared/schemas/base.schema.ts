@@ -2,7 +2,7 @@ import { Prop } from '@nestjs/mongoose';
 import { ObjectId } from 'mongoose';
 
 export class BaseSchema {
-  _id: ObjectId;
+  _id: string;
 
   @Prop()
   createdAt: Date;

@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { UserSchema } from './schemas/user.schema';
 import { DB_CONSTANT } from 'src/shared/constants/db.constant';
+import { UserRepository } from './user.repository';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { DB_CONSTANT } from 'src/shared/constants/db.constant';
       DB_CONSTANT.connectionName.default,
     ),
   ],
-  providers: [UsersService],
-  exports: [UsersService],
+  providers: [UsersService, UserRepository],
+  exports: [UsersService, UserRepository],
 })
 export class UsersModule {}
