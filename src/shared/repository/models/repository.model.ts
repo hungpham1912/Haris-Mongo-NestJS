@@ -4,7 +4,7 @@ export interface FindOptions<T> {
   /**
    * Simple condition that should be applied to match entities.
    */
-  where?: FindOptionsWhere<T>;
+  where?: FindOptionsWhere<T> | FindOptionsWhere<T>[];
   /**
    * Offset (paginated) where from entities should be taken.
    */
@@ -16,13 +16,13 @@ export interface FindOptions<T> {
 }
 
 export interface ParamsQueryBuilder {
-  [key: string]: ProjectionOperators;
+  [key: string]: ComparisonOperators;
 }
 
-export interface ProjectionOperators {
-  /**
-   * ComparisonObject
-   */
+/**
+ * Comparison object
+ */
+export interface ComparisonOperators {
   $eq?;
   $gt?;
   $gte?;
@@ -31,11 +31,14 @@ export interface ProjectionOperators {
   $lte?;
   $ne?;
   $nin?;
-  /**
-   * LogicalObject
-   */
-  $and?;
+}
+
+/**
+ * Logical object
+ */
+export interface LogicalObject<T> {
+  $and?: ParamsQueryBuilder[] | FindOptionsWhere<T>[];
   $not?;
   $nor?;
-  $or?;
+  $or?: ParamsQueryBuilder[] | FindOptionsWhere<T>[];
 }

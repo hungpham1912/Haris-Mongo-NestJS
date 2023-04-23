@@ -23,7 +23,7 @@ export class UsersController {
 
   @Get()
   findAll() {
-    return this.usersService.get();
+    return this.usersService.findAll();
   }
 
   @Get(':id')
@@ -44,5 +44,10 @@ export class UsersController {
   @Get('count/ss')
   count() {
     return this.usersService.count();
+  }
+
+  @Get('get/ss')
+  get() {
+    return this.usersService.get();
   }
 }

@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import { UserRepository } from './user.repository';
+import { Equal } from 'src/shared/repository/helper.repository';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +15,9 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.userRepository.find({ skip: 1 });
+    return await this.userRepository.find({
+      where: [{ fullName: 'h' }, { fullName: 'g' }],
+    });
   }
 
   async findOne(id: string) {
@@ -36,9 +39,8 @@ export class UsersService {
   async get() {
     return await this.userRepository
       .createQueryBuilder()
-      .andWhere({
-        $or: [{ fullName: { $eq: 'h' } }, { fullName: { $eq: 'g' } }],
-      })
+      .andWhere({ phone: Equal('0964816205'), fullName: Equal('g') })
+      .orWhere([{ fullName: Equal('h') }, { fullName: Equal('g') }])
       .select();
   }
 }

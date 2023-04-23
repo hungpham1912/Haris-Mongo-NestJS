@@ -1,9 +1,7 @@
 import { Model } from 'mongoose';
-import {
-  ParamsQueryBuilder,
-  ProjectionOperators,
-} from './models/repository.model';
+import { LogicalObject, ParamsQueryBuilder } from './models/repository.model';
 import { Logger } from '@nestjs/common';
+import { FindOptionsWhere } from 'typeorm';
 
 export class MongoSelectBuilder<T> {
   constructor(public model: Model<T>) {
@@ -14,24 +12,14 @@ export class MongoSelectBuilder<T> {
   private and: any[];
   private or: any[];
 
-  andWhere(
-    query:
-      | ParamsQueryBuilder
-      | ParamsQueryBuilder[]
-      | ProjectionOperators
-      | ProjectionOperators[],
-  ) {
+  andWhere(query: ParamsQueryBuilder | LogicalObject<T> | FindOptionsWhere<T>) {
     this.and.push(query);
     return this;
   }
   orWhere(
-    query:
-      | ParamsQueryBuilder
-      | ParamsQueryBuilder[]
-      | ProjectionOperators
-      | ProjectionOperators[],
+    query: LogicalObject<T>[] | FindOptionsWhere<T>[] | ParamsQueryBuilder[],
   ) {
-    this.or.push(query);
+    this.or.push({ $or: query });
     return this;
   }
   select() {

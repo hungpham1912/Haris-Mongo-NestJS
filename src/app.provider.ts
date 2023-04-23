@@ -1,10 +1,10 @@
 import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
-import { TransformInterceptor } from './wanders/interceptors/transform.interceptor';
+import { TransformInterceptor } from './middlewares/interceptors/transform.interceptor';
 import {
   BadRequestExceptionFilter,
   ForbiddenExceptionFilter,
   UnauthorizedExceptionFilter,
-} from './wanders/filters/filter';
+} from './middlewares/filters/filter';
 
 export const customProvider: Array<any> = [
   {

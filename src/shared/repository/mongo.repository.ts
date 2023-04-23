@@ -4,6 +4,7 @@ import { FindOptionsWhere } from 'typeorm';
 import { DeleteResult, UpdateResult } from 'typeorm/driver/mongodb/typings';
 import { FindOptions } from './models/repository.model';
 import { MongoSelectBuilder } from './mongo.select-builder';
+import { isArray } from 'class-validator';
 
 export class MongoRepository<T> {
   constructor(public model: Model<T>) {
@@ -13,9 +14,11 @@ export class MongoRepository<T> {
     const { where, skip, take } = options
       ? options
       : { where: {}, skip: null, take: null };
+    let query = where;
+    if (isArray(where)) query = { $or: where };
     try {
       return this.model
-        .find({ ...where, deletedAt: { $eq: null } })
+        .find({ ...query, deletedAt: { $eq: null } })
         .limit(take)
         .skip(skip)
         .exec();
