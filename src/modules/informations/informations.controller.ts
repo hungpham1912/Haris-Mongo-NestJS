@@ -1,14 +1,15 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { InformationService } from './informations.service';
-import { CreateInformationDto } from './dto/create-information.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Information')
 @Controller('')
 export class InformationController {
   constructor(private readonly informationService: InformationService) {}
 
   @Post('users/:userId/information')
-  create(@Body() createInformationDto: CreateInformationDto) {
-    return this.informationService.create(createInformationDto);
+  create(@Param('userId') userId: string) {
+    return this.informationService.create(userId);
   }
 
   @Get('information')

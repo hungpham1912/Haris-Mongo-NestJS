@@ -16,7 +16,6 @@ export class UsersService {
 
   async findAll() {
     return await this.userRepository.find({
-      where: { fullName: 'g' },
       order: { createdAt: 'ASC' },
     });
   }
@@ -45,6 +44,7 @@ export class UsersService {
       .andWhere({ fullName: 'asdas' })
       .select()
       .orderBy({ createdAt: 'ASC' })
+      .leftJoinAndSelect('user', 'user.information')
       .execute();
   }
 }

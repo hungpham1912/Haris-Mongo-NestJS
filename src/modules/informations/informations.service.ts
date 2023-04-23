@@ -1,26 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateInformationDto } from './dto/create-information.dto';
-import { UpdateInformationDto } from './dto/update-information.dto';
+import { InformationRepository } from './information.repository';
 
 @Injectable()
 export class InformationService {
-  create(createInformationDto: CreateInformationDto) {
-    return 'This action adds a new information';
+  constructor(public readonly informationRepository: InformationRepository) {}
+
+  create(userId: string) {
+    const sd = this.informationRepository.create({ userId, key: 'adasddas' });
+    return sd.save();
   }
 
   findAll() {
     return `This action returns all informations`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} information`;
-  }
-
-  update(id: number, updateInformationDto: UpdateInformationDto) {
-    return `This action updates a #${id} information`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} information`;
   }
 }

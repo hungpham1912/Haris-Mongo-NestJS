@@ -7,6 +7,7 @@ import { ENV_CONFIG } from './shared/constants/env.constant';
 import { DB_CONSTANT } from './shared/constants/db.constant';
 import { customProvider } from './app.provider';
 import { InformationModule } from './modules/informations/informations.module';
+import { InformationController } from './modules/informations/informations.controller';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { InformationModule } from './modules/informations/informations.module';
     ]),
     InformationModule,
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, InformationController],
   providers: [...customProvider],
 })
 export class AppModule {}
