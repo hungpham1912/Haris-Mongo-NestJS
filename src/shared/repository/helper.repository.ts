@@ -1,5 +1,4 @@
 import { ComparisonOperators } from './models/repository.model';
-
 export const MoreThan = (value): ComparisonOperators => {
   return {
     $gt: value,

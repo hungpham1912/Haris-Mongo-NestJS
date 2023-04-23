@@ -1,14 +1,12 @@
-import { Model } from 'mongoose';
-import {
-  LogicalObject,
-  ParamsQueryBuilder,
-  ParamsSortBuilder,
-} from './models/repository.model';
 import { Logger } from '@nestjs/common';
-import { FindOptionsWhere } from 'typeorm';
+import { Model } from 'mongoose';
+import { FindOptionsWhere, FindOptionsOrder } from 'typeorm';
+import { ParamsQueryBuilder, LogicalObject } from './models/repository.model';
+import { Repository } from './mongo.repository';
 
-export class MongodbSelectBuilder<T> {
+export class MongodbSelectBuilder<T> extends Repository<T> {
   constructor(public model: Model<T>) {
+    super();
     this.model;
     this.and = [];
     this.or = [];
@@ -37,21 +35,7 @@ export class MongodbSelectBuilder<T> {
       this.globalMatch = { ...this.globalMatch, $and: this.and };
     return this;
   }
-  orderBy(options: FindOptionsWhere<T> | ParamsSortBuilder) {
-    let param;
-    Object.entries(options).forEach((value) => {
-      switch (value[1]) {
-        case 'DESC':
-          param = { ...param, [value[0]]: -1 };
-          break;
-        case 'ASC':
-          param = { ...param, [value[0]]: 1 };
-          break;
-        default:
-          param = { ...param, [value[0]]: 1 };
-      }
-    });
-    this.globalSort = { ...this.globalSort, ...param };
+  orderBy(options: FindOptionsOrder<T>) {
     return this;
   }
   getModel() {

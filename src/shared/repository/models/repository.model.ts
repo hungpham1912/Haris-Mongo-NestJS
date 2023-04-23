@@ -1,4 +1,4 @@
-import { FindOptionsWhere } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 
 export interface FindOptions<T> {
   /**
@@ -13,14 +13,14 @@ export interface FindOptions<T> {
    * Limit (paginated) - max number of entities should be taken.
    */
   take?: number;
+  /**
+   * Order, in which entities should be ordered.
+   */
+  order?: FindOptionsOrder<T>;
 }
 
 export interface ParamsQueryBuilder {
   [key: string]: ComparisonOperators;
-}
-
-export interface ParamsSortBuilder {
-  [key: string]: 'DESC' | 'ASC';
 }
 
 /**

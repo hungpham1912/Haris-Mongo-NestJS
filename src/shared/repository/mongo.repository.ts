@@ -1,19 +1,42 @@
 import { Logger } from '@nestjs/common';
 import { FilterQuery, Model } from 'mongoose';
-import { FindOptionsWhere } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { DeleteResult, UpdateResult } from 'typeorm/driver/mongodb/typings';
-import { FindOptions } from './models/repository.model';
-import { MongodbSelectBuilder } from './mongo.select-builder';
+import {
+  FindOptions,
+  LogicalObject,
+  ParamsQueryBuilder,
+} from './models/repository.model';
 import { isArray } from 'class-validator';
+import { MongodbSelectBuilder } from './mongo.select-builder';
 
-export class MongodbRepository<T> {
+export class Repository<T> {
+  mapOrderOption = (options: FindOptionsOrder<T>) => {
+    let param;
+    Object.entries(options).forEach((value) => {
+      switch (value[1]) {
+        case 'DESC' || 'desc':
+          param = { ...param, [value[0]]: -1 };
+          break;
+        case 'ASC' || 'asc':
+          param = { ...param, [value[0]]: 1 };
+          break;
+        default:
+          param = { ...param, [value[0]]: 1 };
+      }
+    });
+    return param;
+  };
+}
+export class MongodbRepository<T> extends Repository<T> {
   constructor(public model: Model<T>) {
+    super();
     this.model;
   }
   find(options?: FindOptions<T>): Promise<T[]> {
-    const { where, skip, take } = options
+    const { where, skip, take, order } = options
       ? options
-      : { where: {}, skip: null, take: null };
+      : { where: {}, skip: null, take: null, order: 1 };
     let query = where;
     if (isArray(where)) query = { $or: where };
     try {
@@ -21,6 +44,7 @@ export class MongodbRepository<T> {
         .find({ ...query, deletedAt: { $eq: null } })
         .limit(take)
         .skip(skip)
+        .sort()
         .exec();
     } catch (error) {
       Logger.error(error);

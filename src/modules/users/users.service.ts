@@ -46,7 +46,7 @@ export class UsersService {
         ],
       })
       .select()
-      .orderBy({ createdAt: 'DESC' })
+      .orderBy({ createdAt: 'ASC' })
       .execute();
   }
 }
