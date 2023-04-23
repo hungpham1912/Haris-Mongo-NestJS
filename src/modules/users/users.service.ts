@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import { UserRepository } from './user.repository';
-import { Equal } from 'src/shared/repository/helper.repository';
+import { Equal, MoreThan } from 'src/shared/repository/helper.repository';
 
 @Injectable()
 export class UsersService {
@@ -39,8 +39,14 @@ export class UsersService {
   async get() {
     return await this.userRepository
       .createQueryBuilder()
-      .andWhere({ phone: Equal('0964816205'), fullName: Equal('g') })
-      .orWhere([{ fullName: Equal('h') }, { fullName: Equal('g') }])
-      .select();
+      .andWhere({
+        $and: [
+          { phone: Equal('0964816205') },
+          { createdAt: MoreThan(new Date('2023-03-22T23:18:39.038+00:00')) },
+        ],
+      })
+      .select()
+      .orderBy({ createdAt: 'DESC' })
+      .execute();
   }
 }

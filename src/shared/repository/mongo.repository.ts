@@ -3,10 +3,10 @@ import { FilterQuery, Model } from 'mongoose';
 import { FindOptionsWhere } from 'typeorm';
 import { DeleteResult, UpdateResult } from 'typeorm/driver/mongodb/typings';
 import { FindOptions } from './models/repository.model';
-import { MongoSelectBuilder } from './mongo.select-builder';
+import { MongodbSelectBuilder } from './mongo.select-builder';
 import { isArray } from 'class-validator';
 
-export class MongoRepository<T> {
+export class MongodbRepository<T> {
   constructor(public model: Model<T>) {
     this.model;
   }
@@ -37,8 +37,10 @@ export class MongoRepository<T> {
   }
   findOne(options?: FindOptions<T>): Promise<T> {
     const { where } = options ? options : { where: {} };
+    let query = where;
+    if (isArray(where)) query = { $or: where };
     try {
-      return this.model.findOne({ ...where, deletedAt: { $eq: null } }).exec();
+      return this.model.findOne({ ...query, deletedAt: { $eq: null } }).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -80,6 +82,6 @@ export class MongoRepository<T> {
     }
   }
   createQueryBuilder() {
-    return new MongoSelectBuilder<T>(this.model);
+    return new MongodbSelectBuilder<T>(this.model);
   }
 }

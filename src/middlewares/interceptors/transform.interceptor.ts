@@ -58,7 +58,7 @@ export class TransformInterceptor<T>
     context.switchToHttp().getResponse().status(status);
 
     console.log(
-      `💥💥 ${method}  ~ ${url} ~ ${status} ${ip.address()} ... ${now}`,
+      `💥💥 ${method} ~ ${status} ~ ${url} ~ ${ip.address()} ... ${now}`,
     );
     return data;
   }

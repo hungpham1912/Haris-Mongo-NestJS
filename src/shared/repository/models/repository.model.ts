@@ -19,6 +19,10 @@ export interface ParamsQueryBuilder {
   [key: string]: ComparisonOperators;
 }
 
+export interface ParamsSortBuilder {
+  [key: string]: 'DESC' | 'ASC';
+}
+
 /**
  * Comparison object
  */
