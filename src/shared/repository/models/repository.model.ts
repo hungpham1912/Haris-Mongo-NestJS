@@ -21,7 +21,11 @@ export interface FindOptions<T> {
 }
 
 export interface ParamsQueryBuilder {
-  [key: string]: ComparisonOperators;
+  [key: string]:
+    | ComparisonOperators
+    | ComparisonOperators[]
+    | ParamsQueryBuilder
+    | ParamsQueryBuilder[];
 }
 
 export interface SortOptionOrder {

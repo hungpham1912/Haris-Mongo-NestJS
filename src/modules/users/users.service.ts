@@ -40,12 +40,9 @@ export class UsersService {
   async get() {
     return await this.userRepository
       .createQueryBuilder()
-      .andWhere({
-        $and: [
-          { phone: Equal('0964816205') },
-          { createdAt: MoreThan(new Date('2023-03-22T23:18:39.038+00:00')) },
-        ],
-      })
+      .orWhere([{ fullName: 'g' }, { fullName: 'h' }])
+      .andWhere({ phone: '0964816123' })
+      .andWhere({ fullName: 'asdas' })
       .select()
       .orderBy({ createdAt: 'ASC' })
       .execute();
