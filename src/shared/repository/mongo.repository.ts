@@ -6,14 +6,14 @@ import {
   FindOptions,
   LogicalObject,
   ParamsQueryBuilder,
+  SortOptionOrder,
 } from './models/repository.model';
 import { isArray } from 'class-validator';
-import { MongodbSelectBuilder } from './mongo.select-builder';
 
 export class Repository<T> {
-  mapOrderOption = (options: FindOptionsOrder<T>) => {
-    let param;
-    Object.entries(options).forEach((value) => {
+  mapOrderOption = (options: FindOptionsOrder<T>): SortOptionOrder => {
+    let param: SortOptionOrder = { createdAt: -1 };
+    Object.entries(options ? options : {}).forEach((value) => {
       switch (value[1]) {
         case 'DESC' || 'desc':
           param = { ...param, [value[0]]: -1 };
@@ -36,7 +36,7 @@ export class MongodbRepository<T> extends Repository<T> {
   find(options?: FindOptions<T>): Promise<T[]> {
     const { where, skip, take, order } = options
       ? options
-      : { where: {}, skip: null, take: null, order: 1 };
+      : { where: {}, skip: null, take: null, order: {} };
     let query = where;
     if (isArray(where)) query = { $or: where };
     try {
@@ -44,7 +44,7 @@ export class MongodbRepository<T> extends Repository<T> {
         .find({ ...query, deletedAt: { $eq: null } })
         .limit(take)
         .skip(skip)
-        .sort()
+        .sort(this.mapOrderOption(order))
         .exec();
     } catch (error) {
       Logger.error(error);
@@ -107,5 +107,63 @@ export class MongodbRepository<T> extends Repository<T> {
   }
   createQueryBuilder() {
     return new MongodbSelectBuilder<T>(this.model);
+  }
+}
+
+/**
+ *
+ *
+ * Select Query Builder
+ * Use for case queries complicated
+ *
+ *
+ */
+class MongodbSelectBuilder<T> extends Repository<T> {
+  constructor(public model: Model<T>) {
+    super();
+    this.model;
+    this.and = [];
+    this.or = [];
+    this.globalMatch = { deletedAt: null };
+    this.globalSort = { createdAt: -1 };
+  }
+  private globalSort;
+  private globalMatch;
+  private and: any[];
+  private or: any[];
+
+  andWhere(query: ParamsQueryBuilder | LogicalObject<T> | FindOptionsWhere<T>) {
+    this.and.push(query);
+    return this;
+  }
+  orWhere(
+    query: LogicalObject<T>[] | FindOptionsWhere<T>[] | ParamsQueryBuilder[],
+  ) {
+    this.or.push({ $or: query });
+    return this;
+  }
+  select() {
+    if (this.or.length > 0)
+      this.globalMatch = { ...this.globalMatch, $or: this.or };
+    if (this.and.length > 0)
+      this.globalMatch = { ...this.globalMatch, $and: this.and };
+    return this;
+  }
+  orderBy(options: FindOptionsOrder<T>) {
+    this.globalSort = this.mapOrderOption(options);
+    return this;
+  }
+  getModel() {
+    return this.model;
+  }
+  execute() {
+    try {
+      return this.model
+        .aggregate([{ $match: this.globalMatch }, { $sort: this.globalSort }])
+        .exec();
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
   }
 }

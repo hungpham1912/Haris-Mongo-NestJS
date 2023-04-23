@@ -16,7 +16,8 @@ export class UsersService {
 
   async findAll() {
     return await this.userRepository.find({
-      where: [{ fullName: 'h' }, { fullName: 'g' }],
+      where: { fullName: 'g' },
+      order: { createdAt: 'ASC' },
     });
   }
 

@@ -1,3 +1,4 @@
+import { SortOrder } from 'mongoose';
 import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 
 export interface FindOptions<T> {
@@ -23,6 +24,9 @@ export interface ParamsQueryBuilder {
   [key: string]: ComparisonOperators;
 }
 
+export interface SortOptionOrder {
+  [key: string]: SortOrder;
+}
 /**
  * Comparison object
  */
