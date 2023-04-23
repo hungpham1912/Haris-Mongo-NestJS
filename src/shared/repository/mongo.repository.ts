@@ -1,18 +1,19 @@
 import { Logger } from '@nestjs/common';
 import { FilterQuery, Model } from 'mongoose';
-import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
+import { DeepPartial, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { DeleteResult, UpdateResult } from 'typeorm/driver/mongodb/typings';
 import {
   FindOptions,
   LogicalObject,
   ParamsQueryBuilder,
-  SortOptionOrder,
+  MapOrderOption,
+  MapFindOptions,
 } from './models/repository.model';
 import { isArray } from 'class-validator';
 
 export class Repository<T> {
-  mapOrderOption = (options: FindOptionsOrder<T>): SortOptionOrder => {
-    let param: SortOptionOrder = { createdAt: -1 };
+  mapOrderOption = (options: FindOptionsOrder<T>): MapOrderOption => {
+    let param: MapOrderOption = { createdAt: -1 };
     Object.entries(options ? options : {}).forEach((value) => {
       switch (value[1]) {
         case 'DESC' || 'desc':
@@ -27,6 +28,24 @@ export class Repository<T> {
     });
     return param;
   };
+  mapFindOption = (options: FindOptions<T>): MapFindOptions<T> => {
+    /**
+     * Default value for options.
+     */
+    const { where, skip, take, order } = options
+      ? options
+      : { where: {}, skip: null, take: null, order: {} };
+    /**
+     * Default value for query.
+     */
+    let mapQuery = where;
+    /**
+     * Handle operator for options.
+     */
+    if (isArray(where)) mapQuery = { $or: where };
+
+    return { mapQuery, skip, take, mapOrder: this.mapOrderOption(order) };
+  };
 }
 export class MongodbRepository<T> extends Repository<T> {
   constructor(public model: Model<T>) {
@@ -34,24 +53,20 @@ export class MongodbRepository<T> extends Repository<T> {
     this.model;
   }
   find(options?: FindOptions<T>): Promise<T[]> {
-    const { where, skip, take, order } = options
-      ? options
-      : { where: {}, skip: null, take: null, order: {} };
-    let query = where;
-    if (isArray(where)) query = { $or: where };
+    const { mapOrder, mapQuery, skip, take } = this.mapFindOption(options);
     try {
       return this.model
-        .find({ ...query, deletedAt: { $eq: null } })
+        .find({ ...mapQuery, deletedAt: { $eq: null } })
         .limit(take)
         .skip(skip)
-        .sort(this.mapOrderOption(order))
+        .sort(mapOrder)
         .exec();
     } catch (error) {
       Logger.error(error);
       throw error;
     }
   }
-  create(object: any) {
+  create(object: DeepPartial<T>) {
     try {
       return new this.model(object);
     } catch (error) {
@@ -70,7 +85,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  updateByQuery(
+  update(
     filter: FilterQuery<T>,
     body: FindOptionsWhere<T>,
   ): Promise<UpdateResult> {
@@ -81,7 +96,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  deleteByQuery(filter: FilterQuery<T>): Promise<DeleteResult> {
+  delete(filter: FilterQuery<T>): Promise<DeleteResult> {
     try {
       return this.model.deleteMany(filter).exec();
     } catch (error) {
@@ -89,7 +104,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  softDeleteByQuery(filter: FilterQuery<T>): Promise<UpdateResult> {
+  softDelete(filter: FilterQuery<T>): Promise<UpdateResult> {
     try {
       return this.model.updateMany(filter, { deletedAt: new Date() }).exec();
     } catch (error) {
@@ -116,10 +131,16 @@ export class MongodbRepository<T> extends Repository<T> {
  * Select Query Builder
  * Use for case queries complicated
  *
- *
+ *`
  */
 class MongodbSelectBuilder<T> extends Repository<T> {
-  constructor(public model: Model<T>) {
+  constructor(
+    public model: Model<T>,
+    private globalSort?,
+    private globalMatch?,
+    private and?: any[],
+    private or?: any[],
+  ) {
     super();
     this.model;
     this.and = [];
@@ -127,10 +148,6 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     this.globalMatch = { deletedAt: null };
     this.globalSort = { createdAt: -1 };
   }
-  private globalSort;
-  private globalMatch;
-  private and: any[];
-  private or: any[];
 
   andWhere(query: ParamsQueryBuilder | LogicalObject<T> | FindOptionsWhere<T>) {
     this.and.push(query);
@@ -156,6 +173,7 @@ class MongodbSelectBuilder<T> extends Repository<T> {
   getModel() {
     return this.model;
   }
+  leftJoinAndSelect() {}
   execute() {
     try {
       return this.model

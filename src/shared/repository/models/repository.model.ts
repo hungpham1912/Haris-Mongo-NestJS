@@ -20,6 +20,21 @@ export interface FindOptions<T> {
   order?: FindOptionsOrder<T>;
 }
 
+export interface MapFindOptions<T> extends FindOptions<T> {
+  /**
+   * New condition that should be applied to match entities.
+   */
+  mapQuery?: FindOptionsWhere<T> | FindOptionsWhere<T>[] | ParamsQueryBuilder;
+  /**
+   * Map order, in which entities should be ordered.
+   */
+  mapOrder?: MapOrderOption;
+}
+
+export interface MapOrderOption {
+  [key: string]: SortOrder;
+}
+
 export interface ParamsQueryBuilder {
   [key: string]:
     | ComparisonOperators
@@ -28,9 +43,6 @@ export interface ParamsQueryBuilder {
     | ParamsQueryBuilder[];
 }
 
-export interface SortOptionOrder {
-  [key: string]: SortOrder;
-}
 /**
  * Comparison object
  */

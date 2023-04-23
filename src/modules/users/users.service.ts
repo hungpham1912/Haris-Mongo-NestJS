@@ -26,11 +26,11 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return await this.userRepository.updateByQuery({ _id: id }, updateUserDto);
+    return await this.userRepository.update({ _id: id }, updateUserDto);
   }
 
   async remove(id: string) {
-    return await this.userRepository.softDeleteByQuery({ _id: id });
+    return await this.userRepository.softDelete({ _id: id });
   }
 
   async count() {
