@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import { UserRepository } from './user.repository';
-import { Equal, MoreThan } from 'src/shared/repository/helper.repository';
+import { Equal, MoreThan } from 'src/shared/repository/helper';
 
 @Injectable()
 export class UsersService {
@@ -40,11 +40,9 @@ export class UsersService {
     return await this.userRepository
       .createQueryBuilder()
       .orWhere([{ fullName: 'g' }, { fullName: 'h' }])
-      .andWhere({ phone: '0964816123' })
-      .andWhere({ fullName: 'asdas' })
       .select()
       .orderBy({ createdAt: 'ASC' })
-      .leftJoinAndSelect('user', 'user.information')
+      // .leftJoinAndSelect('user', 'user.information')
       .execute();
   }
 }

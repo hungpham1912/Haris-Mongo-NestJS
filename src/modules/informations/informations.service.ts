@@ -7,7 +7,10 @@ export class InformationService {
   constructor(public readonly informationRepository: InformationRepository) {}
 
   create(userId: string) {
-    const sd = this.informationRepository.create({ userId, key: 'adasddas' });
+    const sd = this.informationRepository.create({
+      userId,
+      key: 'adasddas',
+    });
     return sd.save();
   }
 

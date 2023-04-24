@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { DeepPartial, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { DeleteResult, UpdateResult } from 'typeorm/driver/mongodb/typings';
 import {
@@ -11,7 +11,7 @@ import {
 } from './models/repository.model';
 import { isArray } from 'class-validator';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-
+import * as crypto from 'crypto';
 export class Repository<T> {
   mapOrderOption = (options: FindOptionsOrder<T>): MapOrderOption => {
     let param: MapOrderOption = { createdAt: -1 };
@@ -107,7 +107,7 @@ export class MongodbRepository<T> extends Repository<T> {
     }
   }
   update(
-    filter: FindOptionsWhere<T>,
+    filter: FilterQuery<T>,
     body: QueryDeepPartialEntity<T>,
   ): Promise<UpdateResult> {
     try {
@@ -117,7 +117,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  delete(filter: FindOptionsWhere<T>): Promise<DeleteResult> {
+  delete(filter: FilterQuery<T>): Promise<DeleteResult> {
     try {
       return this.model.deleteMany(filter).exec();
     } catch (error) {
@@ -125,7 +125,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  softDelete(filter: FindOptionsWhere<T>): Promise<UpdateResult> {
+  softDelete(filter: FilterQuery<T>): Promise<UpdateResult> {
     try {
       return this.model.updateMany(filter, { deletedAt: new Date() }).exec();
     } catch (error) {
@@ -133,7 +133,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  count(query?: FindOptionsWhere<T>) {
+  count(query?: FilterQuery<T>) {
     try {
       return this.model.count({ ...query, deletedAt: { $eq: null } }).exec();
     } catch (error) {
@@ -162,6 +162,7 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     private globalLookup?,
     private and?: any[],
     private or?: any[],
+    private alias?: string,
   ) {
     super();
     this.model;
@@ -170,6 +171,11 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     this.globalMatch = { deletedAt: null };
     this.globalSort = { createdAt: -1 };
     this.globalLookup = {};
+    this.alias = this.model.name;
+    console.log(
+      '🚀 ~ file: mongo.repository.ts:175 ~ MongodbSelectBuilder<T> ~ this.alias:',
+      this.model,
+    );
   }
 
   andWhere(query: ParamsQueryBuilder | LogicalObject<T> | FindOptionsWhere<T>) {
@@ -196,12 +202,17 @@ class MongodbSelectBuilder<T> extends Repository<T> {
   getModel() {
     return this.model;
   }
-  leftJoinAndSelect(table: string, param: string) {
+  leftJoinAndSelect(
+    from: string,
+    localField: string,
+    foreignField: string,
+    relation: 'MTO' | 'OTM',
+  ) {
     this.globalLookup = {
-      from: table,
-      localField: '_id',
-      foreignField: `${table}Id`,
-      as: this.mapJoinAndSelect(param),
+      from,
+      localField,
+      foreignField,
+      as: '',
     };
     return this;
   }
@@ -211,7 +222,14 @@ class MongodbSelectBuilder<T> extends Repository<T> {
         .aggregate([
           { $match: this.globalMatch },
           { $sort: this.globalSort },
-          { $lookup: this.globalLookup },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'userId',
+              foreignField: 'userId',
+              as: 'information',
+            },
+          },
         ])
         .exec();
     } catch (error) {
