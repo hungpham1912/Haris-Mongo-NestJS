@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ENV_CONFIG } from './shared/constants/env.constant';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { RelationInstance } from './shared/repository/constants/relation.constant';
 
 async function bootstrap() {
   const { port, apiVersion } = ENV_CONFIG.system;
@@ -29,5 +30,10 @@ async function bootstrap() {
 
   await app.listen(port);
   Logger.log(`Server listening on http://localhost:${port}/`);
+
+  console.log(
+    '🚀 ~ file: main.ts:33 ~ bootstrap ~ Logger:',
+    RelationInstance.relation,
+  );
 }
 bootstrap();

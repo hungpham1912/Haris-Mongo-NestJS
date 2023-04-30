@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 import { UserRepository } from './user.repository';
 import { Equal, MoreThan } from 'src/shared/repository/helper';
+import { User } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
@@ -37,6 +38,11 @@ export class UsersService {
   }
 
   async get() {
+    const ts = new User();
+    console.log(
+      '🚀 ~ file: users.service.ts:42 ~ UsersService ~ get ~ ts:',
+      ts.information,
+    );
     return await this.userRepository
       .createQueryBuilder()
       .orWhere([{ fullName: 'g' }, { fullName: 'h' }])

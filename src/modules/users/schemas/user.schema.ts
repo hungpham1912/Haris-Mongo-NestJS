@@ -4,11 +4,16 @@ import { BaseSchema } from 'src/shared/schemas/base.schema';
 import { Role } from '../models/users.model';
 import { Information } from 'src/modules/informations/schemas/information.schema';
 import { ManyToOne } from 'typeorm';
-import { MongoManyToOne, MongoOneToMany } from 'src/shared/repository/relation';
+import {
+  BuilderSchema,
+  MongoManyToOne,
+  MongoOneToMany,
+} from 'src/shared/repository/decorators/relation';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
+@BuilderSchema('users')
 export class User extends BaseSchema {
   @Prop({ required: true })
   password: string;
@@ -28,7 +33,7 @@ export class User extends BaseSchema {
   @Prop({ required: true })
   email: string;
 
-  @MongoOneToMany(() => User, (user) => user.information)
+  @MongoOneToMany(() => Information, (information) => information.user)
   information: Information[];
 }
 

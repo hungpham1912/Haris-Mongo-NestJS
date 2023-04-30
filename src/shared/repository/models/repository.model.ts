@@ -1,3 +1,4 @@
+import { Injectable, Scope } from '@nestjs/common';
 import { SortOrder } from 'mongoose';
 import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 
@@ -65,4 +66,20 @@ export interface LogicalObject<T> {
   $not?;
   $nor?;
   $or?: ParamsQueryBuilder[] | FindOptionsWhere<T>[];
+}
+
+export interface RelationType {
+  localField: string;
+  foreignField: string;
+  as: string;
+  type: RelationTypeEnum;
+}
+
+export interface SpaceRelation {
+  [name: string]: { relations: RelationType[]; nameTable: string };
+}
+
+export enum RelationTypeEnum {
+  OTM = 'OTM',
+  MTO = 'MTO',
 }

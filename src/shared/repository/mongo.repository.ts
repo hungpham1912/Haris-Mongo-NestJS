@@ -225,7 +225,7 @@ class MongodbSelectBuilder<T> extends Repository<T> {
           {
             $lookup: {
               from: 'users',
-              localField: 'userId',
+              localField: '_id',
               foreignField: 'userId',
               as: 'information',
             },
