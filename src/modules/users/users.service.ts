@@ -38,17 +38,12 @@ export class UsersService {
   }
 
   async get() {
-    const ts = new User();
-    console.log(
-      '🚀 ~ file: users.service.ts:42 ~ UsersService ~ get ~ ts:',
-      ts.information,
-    );
     return await this.userRepository
       .createQueryBuilder()
       .orWhere([{ fullName: 'g' }, { fullName: 'h' }])
       .select()
       .orderBy({ createdAt: 'ASC' })
-      // .leftJoinAndSelect('user', 'user.information')
+      .leftJoinAndSelect('users', 'information')
       .execute();
   }
 }

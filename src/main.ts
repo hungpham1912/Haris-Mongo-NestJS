@@ -32,8 +32,13 @@ async function bootstrap() {
   Logger.log(`Server listening on http://localhost:${port}/`);
 
   console.log(
-    '🚀 ~ file: main.ts:33 ~ bootstrap ~ Logger:',
-    RelationInstance.relation,
+    '🚀 ~ file: main.ts:33 ~ bootstrap ~ Information:',
+    RelationInstance.relation.Information.relations,
+  );
+
+  console.log(
+    '🚀 ~ file: main.ts:33 ~ bootstrap ~ User:',
+    RelationInstance.relation.User.relations,
   );
 }
 bootstrap();

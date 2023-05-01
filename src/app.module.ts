@@ -8,6 +8,7 @@ import { DB_CONSTANT } from './shared/constants/db.constant';
 import { customProvider } from './app.provider';
 import { InformationModule } from './modules/informations/informations.module';
 import { InformationController } from './modules/informations/informations.controller';
+import { TestModule } from './test/test.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { InformationController } from './modules/informations/informations.contr
       },
     ]),
     InformationModule,
+    TestModule,
   ],
   controllers: [UsersController, InformationController],
   providers: [...customProvider],

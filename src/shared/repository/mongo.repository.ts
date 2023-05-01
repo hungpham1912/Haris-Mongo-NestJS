@@ -12,6 +12,7 @@ import {
 import { isArray } from 'class-validator';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import * as crypto from 'crypto';
+import { RelationInstance } from './constants/relation.constant';
 export class Repository<T> {
   mapOrderOption = (options: FindOptionsOrder<T>): MapOrderOption => {
     let param: MapOrderOption = { createdAt: -1 };
@@ -172,10 +173,6 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     this.globalSort = { createdAt: -1 };
     this.globalLookup = {};
     this.alias = this.model.name;
-    console.log(
-      '🚀 ~ file: mongo.repository.ts:175 ~ MongodbSelectBuilder<T> ~ this.alias:',
-      this.model,
-    );
   }
 
   andWhere(query: ParamsQueryBuilder | LogicalObject<T> | FindOptionsWhere<T>) {
@@ -202,18 +199,30 @@ class MongodbSelectBuilder<T> extends Repository<T> {
   getModel() {
     return this.model;
   }
-  leftJoinAndSelect(
-    from: string,
-    localField: string,
-    foreignField: string,
-    relation: 'MTO' | 'OTM',
-  ) {
-    this.globalLookup = {
-      from,
+  leftJoinAndSelect(from: string, field: string) {
+    const mapTable = RelationInstance.mappingTable;
+    const relationArr = RelationInstance.relation;
+    const re = relationArr[mapTable[from]].relations[field];
+
+    console.log(
+      '🚀 ~ file: mongo.repository.ts:208 ~ MongodbSelectBuilder<T> ~ leftJoinAndSelect ~ arr:',
+      re,
+    );
+
+    const { localField, foreignField, as, type } = re;
+
+    const lookup = {
       localField,
       foreignField,
-      as: '',
+      as,
+      type,
     };
+
+    console.log(
+      '🚀 ~ file: mongo.repository.ts:222 ~ MongodbSelectBuilder<T> ~ leftJoinAndSelect ~ lookup:',
+      3,
+    );
+
     return this;
   }
   execute() {

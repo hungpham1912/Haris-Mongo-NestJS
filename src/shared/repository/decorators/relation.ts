@@ -1,14 +1,12 @@
-import { type } from 'os';
-import { Information } from 'src/modules/informations/schemas/information.schema';
-import { User } from 'src/modules/users/schemas/user.schema';
-import { ObjectType, RelationOptions } from 'typeorm';
-import {
-  RelationType,
-  RelationTypeEnum,
-  SpaceRelation,
-} from '../models/repository.model';
+import { ObjectType } from 'typeorm';
+import { RelationType, RelationTypeEnum } from '../models/repository.model';
 import { RelationInstance } from '../constants/relation.constant';
-export function BuilderSchema<T>(name?: string): ClassDecorator {
+
+const makeForeignKey = (propertyKey: string) => {
+  return propertyKey + 'Id';
+};
+
+export function BuilderSchema(name?: string): ClassDecorator {
   return (target) => {
     RelationInstance.setTable(
       name ? name : target.name.trim().toLocaleLowerCase(),
@@ -18,30 +16,51 @@ export function BuilderSchema<T>(name?: string): ClassDecorator {
 }
 
 export function MongoManyToOne<T>(
-  typeFunctionOrTarget: string | ((type?: any) => ObjectType<T>),
-  inverseSide?: string | ((object: T) => any),
-  options?: RelationOptions,
+  typeFunctionOrTarget: (type?: any) => ObjectType<T>,
+  inverseSide?: (object: T) => any,
 ): PropertyDecorator {
-  return (target: T, propertyKey: string) => {};
+  const tss = typeFunctionOrTarget();
+  console.log('🚀 ~ file: relation.ts:23 ~ tss:', tss.name);
+  return (target: T, propertyKey: string) => {
+    const param: RelationType = {
+      // localField: makeForeignKey(propertyKey),
+      foreignField: makeForeignKey(propertyKey),
+      as: propertyKey,
+      type: RelationTypeEnum.MTO,
+    };
+    RelationInstance.initRelation(
+      param,
+      target.constructor.name,
+      target.constructor.name.trim().toLocaleLowerCase(),
+      propertyKey,
+    );
+
+    Object.defineProperty(target, propertyKey, {
+      get: typeFunctionOrTarget,
+      set: inverseSide,
+    });
+  };
 }
 
 export function MongoOneToMany<T>(
   typeFunctionOrTarget: (type?: any) => ObjectType<T>,
   inverseSide?: (object: T) => any,
 ): PropertyDecorator {
-  // const ad = typeFunctionOrTarget();
-  // const asd: Object<T>;
-  // const ts = inverseSide(asd);
+  const inverse = typeFunctionOrTarget();
+  console.log('🚀 ~ file: relation.ts:48 ~ tss:', inverse.name);
+
   return (target: ObjectType<T>, propertyKey: string) => {
     const param: RelationType = {
       localField: '_id',
-      foreignField: '',
       as: propertyKey,
       type: RelationTypeEnum.OTM,
     };
-    console.log('🚀 ~ file: relation.ts:42 ~ return ~ param:', param);
-    RelationInstance.initRelation(param, target.constructor.name);
-    // };
+    RelationInstance.initRelation(
+      param,
+      target.constructor.name,
+      target.constructor.name.trim().toLocaleLowerCase(),
+      inverse.name,
+    );
 
     Object.defineProperty(target, propertyKey, {
       get: typeFunctionOrTarget,

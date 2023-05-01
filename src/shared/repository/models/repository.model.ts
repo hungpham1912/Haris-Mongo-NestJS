@@ -69,14 +69,21 @@ export interface LogicalObject<T> {
 }
 
 export interface RelationType {
-  localField: string;
-  foreignField: string;
+  localField?: string;
+  foreignField?: string;
   as: string;
   type: RelationTypeEnum;
 }
 
 export interface SpaceRelation {
-  [name: string]: { relations: RelationType[]; nameTable: string };
+  [name: string]: {
+    relations: { [key: string]: RelationType };
+    nameTable: string;
+  };
+}
+
+export interface MappingTable {
+  [name: string]: string;
 }
 
 export enum RelationTypeEnum {

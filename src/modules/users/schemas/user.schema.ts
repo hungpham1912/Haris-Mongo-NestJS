@@ -6,7 +6,6 @@ import { Information } from 'src/modules/informations/schemas/information.schema
 import { ManyToOne } from 'typeorm';
 import {
   BuilderSchema,
-  MongoManyToOne,
   MongoOneToMany,
 } from 'src/shared/repository/decorators/relation';
 
