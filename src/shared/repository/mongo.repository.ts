@@ -1,18 +1,21 @@
 import { Logger } from '@nestjs/common';
 import { FilterQuery, Model } from 'mongoose';
-import { DeepPartial, FindOptionsOrder, FindOptionsWhere } from 'typeorm';
-import { DeleteResult, UpdateResult } from 'typeorm/driver/mongodb/typings';
 import {
   FindOptions,
   LogicalObject,
   ParamsQueryBuilder,
   MapOrderOption,
   MapFindOptions,
+  RelationTypeEnum,
+  FindOptionsOrder,
+  FindOptionsWhere,
+  DeepPartial,
+  QueryDeepPartialEntity,
 } from './models/repository.model';
 import { isArray } from 'class-validator';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import * as crypto from 'crypto';
 import { RelationInstance } from './constants/relation.constant';
+
 export class Repository<T> {
   mapOrderOption = (options: FindOptionsOrder<T>): MapOrderOption => {
     let param: MapOrderOption = { createdAt: -1 };
@@ -78,7 +81,7 @@ export class MongodbRepository<T> extends Repository<T> {
     const { mapOrder, mapQuery, skip, take } = this.mapFindOption(options);
     try {
       return this.model
-        .find({ ...mapQuery, deletedAt: { $eq: null } })
+        .find({ ...mapQuery, deletedAt: { $ne: null } })
         .limit(take)
         .skip(skip)
         .sort(mapOrder)
@@ -101,7 +104,7 @@ export class MongodbRepository<T> extends Repository<T> {
     let query = where;
     if (isArray(where)) query = { $or: where };
     try {
-      return this.model.findOne({ ...query, deletedAt: { $eq: null } }).exec();
+      return this.model.findOne({ ...query, deletedAt: { $ne: null } }).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -110,7 +113,7 @@ export class MongodbRepository<T> extends Repository<T> {
   update(
     filter: FilterQuery<T>,
     body: QueryDeepPartialEntity<T>,
-  ): Promise<UpdateResult> {
+  ): Promise<any> {
     try {
       return this.model.updateMany(filter, body).exec();
     } catch (error) {
@@ -118,7 +121,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  delete(filter: FilterQuery<T>): Promise<DeleteResult> {
+  delete(filter: FilterQuery<T>): Promise<any> {
     try {
       return this.model.deleteMany(filter).exec();
     } catch (error) {
@@ -126,7 +129,7 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  softDelete(filter: FilterQuery<T>): Promise<UpdateResult> {
+  softDelete(filter: FilterQuery<T>): Promise<any> {
     try {
       return this.model.updateMany(filter, { deletedAt: new Date() }).exec();
     } catch (error) {
@@ -160,7 +163,7 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     public model: Model<T>,
     private globalSort?,
     private globalMatch?,
-    private globalLookup?,
+    private globalLookup?: any[],
     private and?: any[],
     private or?: any[],
     private alias?: string,
@@ -171,7 +174,7 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     this.or = [];
     this.globalMatch = { deletedAt: null };
     this.globalSort = { createdAt: -1 };
-    this.globalLookup = {};
+    this.globalLookup = [];
     this.alias = this.model.name;
   }
 
@@ -199,48 +202,39 @@ class MongodbSelectBuilder<T> extends Repository<T> {
   getModel() {
     return this.model;
   }
-  leftJoinAndSelect(from: string, field: string) {
+  lookup(from: string, asField: string) {
     const mapTable = RelationInstance.mappingTable;
     const relationArr = RelationInstance.relation;
-    const re = relationArr[mapTable[from]].relations[field];
+    const { field, as, type, model, inverseAs } =
+      relationArr[mapTable[from]].relations[asField];
+    const { nameTable, relations } = relationArr[model];
 
-    console.log(
-      '🚀 ~ file: mongo.repository.ts:208 ~ MongodbSelectBuilder<T> ~ leftJoinAndSelect ~ arr:',
-      re,
-    );
-
-    const { localField, foreignField, as, type } = re;
-
-    const lookup = {
-      localField,
-      foreignField,
+    const $lookup = {
+      from: nameTable,
+      localField: field,
+      foreignField: relations[inverseAs].field,
       as,
-      type,
     };
 
-    console.log(
-      '🚀 ~ file: mongo.repository.ts:222 ~ MongodbSelectBuilder<T> ~ leftJoinAndSelect ~ lookup:',
-      3,
-    );
+    this.globalLookup.push({ $lookup });
 
+    if (type === RelationTypeEnum.MTO)
+      this.globalLookup.push({
+        $unwind: {
+          path: `$${as}`,
+          preserveNullAndEmptyArrays: true,
+        },
+      });
     return this;
   }
   execute() {
     try {
-      return this.model
-        .aggregate([
-          { $match: this.globalMatch },
-          { $sort: this.globalSort },
-          {
-            $lookup: {
-              from: 'users',
-              localField: '_id',
-              foreignField: 'userId',
-              as: 'information',
-            },
-          },
-        ])
-        .exec();
+      const query = [
+        { $match: this.globalMatch },
+        { $sort: this.globalSort },
+        ...this.globalLookup,
+      ];
+      return this.model.aggregate(query).exec();
     } catch (error) {
       Logger.error(error);
       throw error;

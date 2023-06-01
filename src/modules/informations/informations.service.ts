@@ -17,4 +17,13 @@ export class InformationService {
   findAll() {
     return `This action returns all informations`;
   }
+
+  async get() {
+    return await this.informationRepository
+      .createQueryBuilder()
+      .select()
+      .orderBy({ createdAt: 'ASC' })
+      .lookup('information', 'user')
+      .execute();
+  }
 }

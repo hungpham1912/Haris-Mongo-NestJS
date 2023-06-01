@@ -17,17 +17,26 @@ export class RelationInstance {
     nameEntity: string,
     nameTable: string,
     as: string,
+    inverseSide: string,
   ) {
     if (this.relation[nameEntity]) {
       this.relation[nameEntity].relations[as] = param;
-      return;
+    } else {
+      this.relation[nameEntity] = {
+        relations: {
+          [as]: param,
+        },
+        nameTable,
+      };
     }
-    this.relation[nameEntity] = {
-      relations: {
-        [as]: param,
-      },
-      nameTable,
-    };
+    if (param.model && inverseSide) {
+      if (this.relation[param.model].relations[inverseSide])
+        this.relation[param.model].relations[inverseSide].model = nameEntity;
+      else
+        this.relation[param.model].relations[inverseSide] = {
+          model: nameEntity,
+        };
+    }
   }
   public static setTable(nameTable: string, nameEntity: string) {
     this.relation[nameEntity].nameTable = nameTable;

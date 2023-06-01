@@ -8,7 +8,9 @@ import { DB_CONSTANT } from './shared/constants/db.constant';
 import { customProvider } from './app.provider';
 import { InformationModule } from './modules/informations/informations.module';
 import { InformationController } from './modules/informations/informations.controller';
-import { TestModule } from './test/test.module';
+import { TestModule } from './modules/test/test.module';
+import { DemoModule } from './modules/demo/demo.module';
+import { TestController } from './modules/test/test.controller';
 
 @Module({
   imports: [
@@ -24,8 +26,9 @@ import { TestModule } from './test/test.module';
     ]),
     InformationModule,
     TestModule,
+    DemoModule,
   ],
-  controllers: [UsersController, InformationController],
+  controllers: [UsersController, InformationController, TestController],
   providers: [...customProvider],
 })
 export class AppModule {}

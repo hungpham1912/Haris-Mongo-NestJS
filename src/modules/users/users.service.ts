@@ -43,7 +43,8 @@ export class UsersService {
       .orWhere([{ fullName: 'g' }, { fullName: 'h' }])
       .select()
       .orderBy({ createdAt: 'ASC' })
-      .leftJoinAndSelect('users', 'information')
+      .lookup('users', 'information')
+      .lookup('users', 'tests')
       .execute();
   }
 }

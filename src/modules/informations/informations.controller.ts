@@ -16,4 +16,9 @@ export class InformationController {
   findAll() {
     return this.informationService.findAll();
   }
+
+  @Get('information/ss')
+  ss() {
+    return this.informationService.get();
+  }
 }

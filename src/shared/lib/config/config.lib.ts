@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import config = require('config');
 
 export function getConfig(key: string, defaultValue: any = null) {
@@ -8,6 +9,7 @@ export function getConfig(key: string, defaultValue: any = null) {
     }
     return value;
   } catch (error) {
-    console.log('🚀 ~ file: getConfig.ts ~ line 12 ~ getConfig ~ error', error);
+    Logger.error(`🚀 ~ file: config.lib.ts:12 ~ getConfig: ${error}`);
+    return;
   }
 }

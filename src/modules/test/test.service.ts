@@ -1,26 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
+import { TestRepository } from './test.repository';
 
 @Injectable()
 export class TestService {
-  create(createTestDto: CreateTestDto) {
-    return 'This action adds a new test';
-  }
+  constructor(public readonly testRepository: TestRepository) {}
 
-  findAll() {
-    return `This action returns all test`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} test`;
-  }
-
-  update(id: number, updateTestDto: UpdateTestDto) {
-    return `This action updates a #${id} test`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} test`;
+  create(informationId: string) {
+    console.log(
+      '🚀 ~ file: test.service.ts:12 ~ TestService ~ create ~ informationId:',
+      informationId,
+    );
+    const sd = this.testRepository.create({
+      informationId,
+    });
+    return sd.save();
   }
 }

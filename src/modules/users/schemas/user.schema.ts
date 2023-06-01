@@ -3,11 +3,12 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { BaseSchema } from 'src/shared/schemas/base.schema';
 import { Role } from '../models/users.model';
 import { Information } from 'src/modules/informations/schemas/information.schema';
-import { ManyToOne } from 'typeorm';
 import {
   BuilderSchema,
+  MongoManyToOne,
   MongoOneToMany,
 } from 'src/shared/repository/decorators/relation';
+import { Test } from 'src/modules/test/schemas/test.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -32,8 +33,17 @@ export class User extends BaseSchema {
   @Prop({ required: true })
   email: string;
 
-  @MongoOneToMany(() => Information, (information) => information.user)
+  @Prop({
+    required: true,
+  })
+  testsId: string;
+
+  @MongoOneToMany(() => Information, 'user')
   information: Information[];
+
+  @MongoManyToOne(() => Test, 'user')
+  tests: Test;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.add({ testsId: mongoose.Schema.Types.ObjectId });

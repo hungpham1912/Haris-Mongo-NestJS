@@ -30,6 +30,7 @@ async function bootstrap() {
 
   await app.listen(port);
   Logger.log(`Server listening on http://localhost:${port}/`);
+  Logger.log(`Swagger on http://localhost:${port}/docs/api`);
 
   console.log(
     '🚀 ~ file: main.ts:33 ~ bootstrap ~ Information:',
@@ -39,6 +40,11 @@ async function bootstrap() {
   console.log(
     '🚀 ~ file: main.ts:33 ~ bootstrap ~ User:',
     RelationInstance.relation.User.relations,
+  );
+
+  console.log(
+    '🚀 ~ file: main.ts:33 ~ bootstrap ~ Test:',
+    RelationInstance.relation.Test.relations,
   );
 }
 bootstrap();
