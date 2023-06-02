@@ -37,23 +37,47 @@ export class Repository<T> {
     /**
      * Default value for options.
      */
-    const { where, skip, take, order, withDeleted } = options
+    const { where, skip, take, order, withDeleted, select } = options
       ? options
-      : { where: {}, skip: null, take: null, order: {}, withDeleted: false };
+      : {
+          where: {},
+          skip: null,
+          take: null,
+          order: {},
+          withDeleted: false,
+          select: null,
+        };
     /**
      * Default value for query.
      */
     let mapQuery = where;
+    let projection;
     /**
      * Handle operator for options.
      */
     if (isArray(where)) mapQuery = { $or: where };
+    /**
+     * Handle case soft delete.
+     */
     if (!withDeleted) mapQuery = { ...mapQuery, deletedAt: { $eq: null } };
+    /**
+     * Handle projection.
+     */
+    if (select) {
+      projection = { _id: 0 };
+      select.forEach((column) => {
+        projection[column] = 1;
+      });
+    }
+    /**
+     *
+     */
     return {
       mapQuery,
       skip,
       take,
       mapOrder: this.mapOrderOption(order),
+      projection,
     };
   };
   mapJoinAndSelect = (parma: string): string => {
@@ -85,10 +109,11 @@ export class MongodbRepository<T> extends Repository<T> {
     this.model;
   }
   find(options?: FindOptions<T>): Promise<T[]> {
-    const { mapOrder, mapQuery, skip, take } = this.mapFindOption(options);
+    const { mapOrder, mapQuery, skip, take, projection } =
+      this.mapFindOption(options);
     try {
       return this.model
-        .find(mapQuery)
+        .find(mapQuery, projection)
         .limit(take)
         .skip(skip)
         .sort(mapOrder)

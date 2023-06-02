@@ -243,7 +243,11 @@ export type FindOptionsWhere<Entity> = {
     ? unknown
     : FindOptionsWhereProperty<NonNullable<Entity[P]>>;
 };
-
+/**
+ * Property paths (column names) to be selected by "find" defined as string.
+ * Old selection mechanism in TypeORM.
+ */
+export declare type FindOptionsSelectByString<Entity> = (keyof Entity)[];
 export interface FindOptions<T> {
   /**
    * Simple condition that should be applied to match entities.
@@ -265,6 +269,10 @@ export interface FindOptions<T> {
    * Return data with deletedAt.
    */
   withDeleted?: boolean;
+  /**
+   * Select column of entities.
+   */
+  select?: FindOptionsSelectByString<T>;
 }
 
 export interface MapFindOptions<T> extends FindOptions<T> {
@@ -280,6 +288,10 @@ export interface MapFindOptions<T> extends FindOptions<T> {
    * Map order, in which entities should be ordered.
    */
   mapOrder: MapOrderOption;
+  /**
+   * $project.
+   */
+  projection: any;
 }
 
 export interface MapOrderOption {
