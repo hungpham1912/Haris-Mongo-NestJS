@@ -241,7 +241,7 @@ export type FindOptionsWhereProperty<
 export type FindOptionsWhere<Entity> = {
   [P in keyof Entity]?: P extends 'toString'
     ? unknown
-    : FindOptionsWhereProperty<NonNullable<Entity[P]>>;
+    : FindOptionsWhereProperty<NonNullable<Entity[P]>> | ComparisonOperators;
 };
 /**
  * Property paths (column names) to be selected by "find" defined as string.

@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import { UserRepository } from './user.repository';
-import { Equal, MoreThan } from 'src/shared/repository/helper';
+import { Equal, In, MoreThan } from 'src/shared/repository/helper';
 import { User } from './schemas/user.schema';
 
 @Injectable()
@@ -17,6 +17,7 @@ export class UsersService {
 
   async findAll() {
     return await this.userRepository.find({
+      where: { fullName: In(['h', 'g']) },
       order: { createdAt: 'ASC' },
     });
   }
