@@ -22,7 +22,9 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    return await this.userRepository.findOne({ where: { _id: id } });
+    return await this.userRepository.findOne({
+      where: { _id: id },
+    });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -38,13 +40,13 @@ export class UsersService {
   }
 
   async get() {
-    return await this.userRepository
+    const es = await this.userRepository
       .createQueryBuilder()
-      .orWhere([{ fullName: 'g' }, { fullName: 'h' }])
-      .select()
       .orderBy({ createdAt: 'ASC' })
       .lookup('users', 'information')
       .lookup('users', 'tests')
+      .withDeleted()
       .execute();
+    return es;
   }
 }

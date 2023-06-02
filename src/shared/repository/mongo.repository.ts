@@ -37,9 +37,9 @@ export class Repository<T> {
     /**
      * Default value for options.
      */
-    const { where, skip, take, order } = options
+    const { where, skip, take, order, withDeleted } = options
       ? options
-      : { where: {}, skip: null, take: null, order: {} };
+      : { where: {}, skip: null, take: null, order: {}, withDeleted: false };
     /**
      * Default value for query.
      */
@@ -48,7 +48,13 @@ export class Repository<T> {
      * Handle operator for options.
      */
     if (isArray(where)) mapQuery = { $or: where };
-    return { mapQuery, skip, take, mapOrder: this.mapOrderOption(order) };
+    if (!withDeleted) mapQuery = { ...mapQuery, deletedAt: { $eq: null } };
+    return {
+      mapQuery,
+      skip,
+      take,
+      mapOrder: this.mapOrderOption(order),
+    };
   };
   mapJoinAndSelect = (parma: string): string => {
     /**
@@ -72,6 +78,7 @@ export class Repository<T> {
     return alias;
   };
 }
+
 export class MongodbRepository<T> extends Repository<T> {
   constructor(public model: Model<T>) {
     super();
@@ -81,7 +88,7 @@ export class MongodbRepository<T> extends Repository<T> {
     const { mapOrder, mapQuery, skip, take } = this.mapFindOption(options);
     try {
       return this.model
-        .find({ ...mapQuery, deletedAt: { $ne: null } })
+        .find(mapQuery)
         .limit(take)
         .skip(skip)
         .sort(mapOrder)
@@ -100,11 +107,9 @@ export class MongodbRepository<T> extends Repository<T> {
     }
   }
   findOne(options?: FindOptions<T>): Promise<T> {
-    const { where } = options ? options : { where: {} };
-    let query = where;
-    if (isArray(where)) query = { $or: where };
+    const { mapQuery } = this.mapFindOption(options);
     try {
-      return this.model.findOne({ ...query, deletedAt: { $ne: null } }).exec();
+      return this.model.findOne(mapQuery).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -137,9 +142,10 @@ export class MongodbRepository<T> extends Repository<T> {
       throw error;
     }
   }
-  count(query?: FilterQuery<T>) {
+  count(options?: FindOptions<T>) {
+    const { mapQuery } = this.mapFindOption(options);
     try {
-      return this.model.count({ ...query, deletedAt: { $eq: null } }).exec();
+      return this.model.count(mapQuery).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -167,40 +173,61 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     private and?: any[],
     private or?: any[],
     private alias?: string,
+    private globalQuery?: any[],
+    private deletedAt?: ParamsQueryBuilder,
   ) {
     super();
     this.model;
     this.and = [];
     this.or = [];
-    this.globalMatch = { deletedAt: null };
+    this.globalMatch = {};
     this.globalSort = { createdAt: -1 };
     this.globalLookup = [];
     this.alias = this.model.name;
+    this.deletedAt = { deletedAt: { $eq: null } };
   }
-
+  private builderQuery() {
+    let match;
+    if (this.or.length > 0) match = { ...match, $or: this.or };
+    if (this.and.length > 0) match = { match, $and: this.and };
+    this.globalMatch = { ...match, ...this.deletedAt };
+    this.globalQuery = [
+      { $match: this.globalMatch },
+      { $sort: this.globalSort },
+      ...this.globalLookup,
+    ];
+  }
   andWhere(query: ParamsQueryBuilder | LogicalObject<T> | FindOptionsWhere<T>) {
     this.and.push(query);
+    this.builderQuery();
     return this;
   }
   orWhere(
     query: LogicalObject<T>[] | FindOptionsWhere<T>[] | ParamsQueryBuilder[],
   ) {
     this.or.push({ $or: query });
+    this.builderQuery();
     return this;
   }
   select() {
-    if (this.or.length > 0)
-      this.globalMatch = { ...this.globalMatch, $or: this.or };
-    if (this.and.length > 0)
-      this.globalMatch = { ...this.globalMatch, $and: this.and };
+    //////
     return this;
   }
   orderBy(options: FindOptionsOrder<T>) {
     this.globalSort = this.mapOrderOption(options);
+    this.builderQuery();
     return this;
   }
   getModel() {
     return this.model;
+  }
+  getQuery() {
+    return this.globalQuery;
+  }
+  withDeleted() {
+    this.deletedAt = {};
+    this.builderQuery();
+    return this;
   }
   lookup(from: string, asField: string) {
     const mapTable = RelationInstance.mappingTable;
@@ -208,16 +235,13 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     const { field, as, type, model, inverseAs } =
       relationArr[mapTable[from]].relations[asField];
     const { nameTable, relations } = relationArr[model];
-
     const $lookup = {
       from: nameTable,
       localField: field,
       foreignField: relations[inverseAs].field,
       as,
     };
-
     this.globalLookup.push({ $lookup });
-
     if (type === RelationTypeEnum.MTO)
       this.globalLookup.push({
         $unwind: {
@@ -225,16 +249,12 @@ class MongodbSelectBuilder<T> extends Repository<T> {
           preserveNullAndEmptyArrays: true,
         },
       });
+    this.builderQuery();
     return this;
   }
   execute() {
     try {
-      const query = [
-        { $match: this.globalMatch },
-        { $sort: this.globalSort },
-        ...this.globalLookup,
-      ];
-      return this.model.aggregate(query).exec();
+      return this.model.aggregate(this.globalQuery).exec();
     } catch (error) {
       Logger.error(error);
       throw error;

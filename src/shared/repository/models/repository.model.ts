@@ -261,17 +261,25 @@ export interface FindOptions<T> {
    * Order, in which entities should be ordered.
    */
   order?: FindOptionsOrder<T>;
+  /**
+   * Return data with deletedAt.
+   */
+  withDeleted?: boolean;
 }
 
 export interface MapFindOptions<T> extends FindOptions<T> {
   /**
    * New condition that should be applied to match entities.
    */
-  mapQuery?: FindOptionsWhere<T> | FindOptionsWhere<T>[] | ParamsQueryBuilder;
+  mapQuery:
+    | FindOptionsWhere<T>
+    | FindOptionsWhere<T>[]
+    | ParamsQueryBuilder
+    | any;
   /**
    * Map order, in which entities should be ordered.
    */
-  mapOrder?: MapOrderOption;
+  mapOrder: MapOrderOption;
 }
 
 export interface MapOrderOption {
