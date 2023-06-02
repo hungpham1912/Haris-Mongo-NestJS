@@ -11,6 +11,7 @@ import {
   FindOptionsWhere,
   DeepPartial,
   QueryDeepPartialEntity,
+  FindOptionsSelectByString,
 } from './models/repository.model';
 import { isArray } from 'class-validator';
 import * as crypto from 'crypto';
@@ -200,6 +201,7 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     private alias?: string,
     private globalQuery?: any[],
     private deletedAt?: ParamsQueryBuilder,
+    private globalProject?: { [key: string]: 0 | 1 },
   ) {
     super();
     this.model;
@@ -210,6 +212,7 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     this.globalLookup = [];
     this.alias = this.model.name;
     this.deletedAt = { deletedAt: { $eq: null } };
+    this.globalProject = null;
   }
   private builderQuery() {
     let match;
@@ -221,6 +224,8 @@ class MongodbSelectBuilder<T> extends Repository<T> {
       { $sort: this.globalSort },
       ...this.globalLookup,
     ];
+    if (this.globalProject)
+      this.globalQuery.push({ $project: this.globalProject });
   }
   andWhere(query: ParamsQueryBuilder | LogicalObject<T> | FindOptionsWhere<T>) {
     this.and.push(query);
@@ -234,8 +239,12 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     this.builderQuery();
     return this;
   }
-  select() {
-    //////
+  select(select?: FindOptionsSelectByString<T>) {
+    const project: any = { _id: 0 };
+    select.forEach((column) => {
+      project[column] = 1;
+    });
+    this.globalProject = project;
     return this;
   }
   orderBy(options: FindOptionsOrder<T>) {

@@ -44,6 +44,7 @@ export class UsersService {
     const es = await this.userRepository
       .createQueryBuilder()
       .orderBy({ createdAt: 'ASC' })
+      .select(['tests'])
       .lookup('users', 'information')
       .lookup('users', 'tests')
       .withDeleted()
