@@ -27,6 +27,7 @@ export class RelationInstance {
           [as]: param,
         },
         nameTable,
+        leave: [],
       };
     }
     if (param.model && inverseSide) {
@@ -38,8 +39,20 @@ export class RelationInstance {
         };
     }
   }
-  public static setTable(nameTable: string, nameEntity: string) {
+  public static initTable(nameTable: string, nameEntity: string) {
     this.relation[nameEntity].nameTable = nameTable;
     this.mappingTable[nameTable] = nameEntity;
+  }
+  public static initLeave(nameEntity: string, propertyKey: string) {
+    if (this.relation[nameEntity]) {
+      this.relation[nameEntity].leave.push(propertyKey);
+      return;
+    }
+    this.relation[nameEntity] = {
+      relations: {},
+      nameTable: '',
+      leave: [propertyKey],
+    };
+    return;
   }
 }

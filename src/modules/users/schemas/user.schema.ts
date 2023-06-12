@@ -5,6 +5,7 @@ import { Role } from '../models/users.model';
 import { Information } from 'src/modules/informations/schemas/information.schema';
 import {
   BuilderSchema,
+  Leave,
   MongoManyToOne,
   MongoOneToMany,
 } from 'src/shared/repository/decorators/relation';
@@ -15,6 +16,7 @@ export type UserDocument = HydratedDocument<User>;
 @Schema({ timestamps: true })
 @BuilderSchema('users')
 export class User extends BaseSchema {
+  @Leave()
   @Prop({ required: true })
   password: string;
 

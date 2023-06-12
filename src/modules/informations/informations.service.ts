@@ -23,7 +23,7 @@ export class InformationService {
       .createQueryBuilder()
       .select()
       .orderBy({ createdAt: 'ASC' })
-      .lookup('information', 'user')
+      .lookup('ma', 'user')
       .execute();
   }
 }

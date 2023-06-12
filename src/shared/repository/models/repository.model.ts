@@ -342,6 +342,7 @@ export interface SpaceRelation {
   [name: string]: {
     relations: { [key: string]: RelationType };
     nameTable: string;
+    leave: string[];
   };
 }
 

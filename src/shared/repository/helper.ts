@@ -9,6 +9,11 @@ export const Equal = (value): ComparisonOperators => {
     $eq: value,
   };
 };
+export const NotEqual = (value): ComparisonOperators => {
+  return {
+    $ne: value,
+  };
+};
 export const MoreThanOrEqual = (value): ComparisonOperators => {
   return {
     $gte: value,

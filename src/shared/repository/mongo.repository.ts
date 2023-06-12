@@ -12,6 +12,7 @@ import {
   DeepPartial,
   QueryDeepPartialEntity,
   FindOptionsSelectByString,
+  ObjectType,
 } from './models/repository.model';
 import { isArray } from 'class-validator';
 import * as crypto from 'crypto';
@@ -70,6 +71,12 @@ export class Repository<T> {
         projection[column] = 1;
       });
     }
+    let target: ObjectType<T>;
+    console.log(
+      '🚀 ~ file: mongo.repository.ts:86 ~ Repository<T> ~ target:',
+      target.name,
+    );
+
     /**
      *
      */
@@ -133,9 +140,9 @@ export class MongodbRepository<T> extends Repository<T> {
     }
   }
   findOne(options?: FindOptions<T>): Promise<T> {
-    const { mapQuery } = this.mapFindOption(options);
+    const { mapQuery, projection } = this.mapFindOption(options);
     try {
-      return this.model.findOne(mapQuery).exec();
+      return this.model.findOne(mapQuery, projection).exec();
     } catch (error) {
       Logger.error(error);
       throw error;
@@ -259,6 +266,11 @@ class MongodbSelectBuilder<T> extends Repository<T> {
     return this.globalQuery;
   }
   withDeleted() {
+    this.deletedAt = {};
+    this.builderQuery();
+    return this;
+  }
+  withLeave(from: string) {
     this.deletedAt = {};
     this.builderQuery();
     return this;

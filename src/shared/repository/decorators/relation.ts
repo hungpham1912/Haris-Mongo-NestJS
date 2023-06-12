@@ -7,7 +7,7 @@ import { RelationInstance } from '../constants/relation.constant';
 
 export function BuilderSchema(name?: string): ClassDecorator {
   return (target) => {
-    RelationInstance.setTable(
+    RelationInstance.initTable(
       name ? name : target.name.trim().toLocaleLowerCase(),
       target.name,
     );
@@ -40,6 +40,12 @@ export function MongoOneToMany<T>(
     inverseType,
     inverseSide,
   );
+}
+
+export function Leave<T>(): PropertyDecorator {
+  return (target: T, propertyKey: string) => {
+    RelationInstance.initLeave(target.constructor.name, propertyKey);
+  };
 }
 
 const makeForeignKey = (propertyKey: string) => {

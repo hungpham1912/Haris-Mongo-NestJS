@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import { UserRepository } from './user.repository';
-import { Equal, In, MoreThan } from 'src/shared/repository/helper';
+import { Equal, In, MoreThan, NotEqual } from 'src/shared/repository/helper';
 import { User } from './schemas/user.schema';
 
 @Injectable()
@@ -25,6 +25,8 @@ export class UsersService {
   async findOne(id: string) {
     return await this.userRepository.findOne({
       where: { _id: id },
+      select: ['fullName'],
+      withDeleted: true,
     });
   }
 
@@ -43,11 +45,7 @@ export class UsersService {
   async get() {
     const es = await this.userRepository
       .createQueryBuilder()
-      .orderBy({ createdAt: 'ASC' })
-      .select(['tests'])
-      .lookup('users', 'information')
-      .lookup('users', 'tests')
-      .withDeleted()
+      .andWhere({ email: NotEqual(null) })
       .execute();
     return es;
   }
