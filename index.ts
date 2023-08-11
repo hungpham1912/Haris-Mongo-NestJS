@@ -7,6 +7,5 @@ export * from './shared/schemas/base.schema';
 export * from './shared/basic.response';
 export * from './middleware/interceptors/transform.interceptor';
 export * from './middleware/pipes/uuid.pipe';
-export * from './middleware/filters/filter';
 export * from './middleware/decorators/auth.decorator';
 export * from './middleware/decorators/public.decorator';
