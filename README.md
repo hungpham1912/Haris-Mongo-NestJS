@@ -1,42 +1,45 @@
-## File config/default.yaml
-```bash
-system: 
-  port: 3000
-  api_version: 1
-database: 
-  url:
-jwt:
-  secret: 
-```
+<center> <h3>Hello, I'm  Hung (Mr) </h3> </center> 
+<br />
 
-## Installation
+This package is library for build pagination with NestJS and TypeORm
 
-```bash
-$ yarn
-```
+**About me**
 
-## Running the app
+- 💬 Ask me about anything [here](https://www.facebook.com/pham.thanhhung.1912/)
 
-```bash
-# development
-$ yarn start
+**About this package**
 
-# watch mode
-$ yarn dev
+- Example for <h3>Schema</h3>
+<br />
 
-# production mode
-$ yarn start:prod
-```
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693156687193-urhg.png)
 
-## Test
+- Example for build <h3>Repository</h3>
+<br />
 
-```bash
-# unit tests
-$ yarn test
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693156687193-urhg.png)
 
-# e2e tests
-$ yarn test:e2e
 
-# test coverage
-$ yarn test:cov
-```
+- Example for function of <h3>Repository</h3>
+<br />
+
+      - <h3>create() and save() </h3>
+
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693156941561-pzYn.png)
+
+      - <h3>findOne()</h3>
+
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693157197658-kRl7.png)
+
+      - <h3>find()</h3>
+
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693157276096-Y0Wv.png)
+
+      - <h3>update()</h3>
+
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693157355774-uxgj.png)
+
+
+      - <h3>softDelete()</h3>
+
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693157355774-uxgj.png)
