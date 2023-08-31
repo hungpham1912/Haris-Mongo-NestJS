@@ -17,7 +17,7 @@ This package is library for build pagination with NestJS and TypeORm
 - Example for build <h3>Repository</h3>
 <br />
 
-![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693156687193-urhg.png)
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693458234825-jSBB.png)
 
 
 - Example for function of <h3>Repository</h3>
@@ -42,4 +42,4 @@ This package is library for build pagination with NestJS and TypeORm
 
       - <h3>softDelete()</h3>
 
-![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693157355774-uxgj.png)
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693458181058-46eW.png)
