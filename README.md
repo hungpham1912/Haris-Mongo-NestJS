@@ -25,7 +25,7 @@ This package is library for build pagination with NestJS and TypeORm
 
       - <h3>create() and save() </h3>
 
-![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693156941561-pzYn.png)
+![Alt text](https://objectstorage.me-jeddah-1.oraclecloud.com/p/8jTRwOquLXJu0e4ztgaqVbcvfxiMnQDJUYlxe7L36nX4AeVPlHMeOr6ipc0zjga9/n/axvbzxxuh4db/b/booking-locate-public-ticket/o/booking-ticket/file1693457895843-UnWF.png)
 
       - <h3>findOne()</h3>
 
